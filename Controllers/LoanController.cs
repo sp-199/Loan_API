@@ -83,7 +83,7 @@ namespace Loan_API.Controllers
         [Authorize(Roles = "Accountant")]
         public IActionResult DeleteLoan([FromBody] LoanDto loanDto, int id)
         {
-            _logger.LogInformation("User {User} deleted a loan with id = {Currency}", User.FindFirst(ClaimTypes.NameIdentifier)?.Value, dto.Amount, dto.Currency);
+            _logger.LogInformation("User {User} deleted a loan with id = {Currency}", User.FindFirst(ClaimTypes.NameIdentifier)?.Value, loanDto.Amount, loanDto.Currency);
             if (loanDto == null)
             {
                 return BadRequest("Invalid loan delete data.");

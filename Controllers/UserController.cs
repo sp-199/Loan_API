@@ -19,6 +19,8 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public IActionResult RegisterUser([FromBody] UserDto userDto)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
         var user = _userService.Registration(userDto);
         return Ok(user);
     }

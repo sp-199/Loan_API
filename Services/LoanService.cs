@@ -7,10 +7,12 @@ using Microsoft.OpenApi.Models;
 namespace Loan_API.Services;
 public class LoanService : ILoanService
 {
+    private readonly ILogger<LoanService> _logger;
     private readonly ApplicationDbContext _dbContext;
-    public LoanService(ApplicationDbContext dbContext)
+    public LoanService(ApplicationDbContext dbContext, ILogger<LoanService> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
     public Loan ApplyForLoan(LoanDto loanDto, int userId)
     {
@@ -20,6 +22,7 @@ public class LoanService : ILoanService
             throw new Exception("User is black-listed");
         }
         // Map LoanDto to Loan entity
+        _logger.LogDebug("Creating loan for user {UserId} with DTO {@Dto}", userId, loanDto);
         var loan = new Loan
         {
             UserId = userId,
@@ -32,6 +35,7 @@ public class LoanService : ILoanService
         // Here you would typically save the loan to the database
         _dbContext.Loans.Add(loan);
         _dbContext.SaveChanges();
+        _logger.LogInformation("Created loan {LoanId} for user {UserId}", loan.Id, userId);
         return loan;
     }
     public List<Loan> DisplayLoans(int userId)
@@ -54,6 +58,7 @@ public class LoanService : ILoanService
         loan.Currency = loanDto.Currency;
         loan.PeriodMonths = loanDto.PeriodMonths;
         _dbContext.SaveChanges();
+        _logger.LogInformation("Updated loan {LoanId}", loan.Id);
         return loan;
     }
 
@@ -64,6 +69,7 @@ public class LoanService : ILoanService
         {
             throw new Exception("Loan not found");
         }
+        _logger.LogInformation("Deleted loan {LoanId}", loan.Id);
         _dbContext.Loans.Remove(loan);
         _dbContext.SaveChanges();
     }
