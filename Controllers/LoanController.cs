@@ -46,7 +46,9 @@ namespace Loan_API.Controllers
         [Authorize]
         public IActionResult ApplyForLoan([FromBody] LoanDto loanDto)
         {
-            _logger.LogInformation("User {User} requested a loan of {Amount} {Currency}", User.FindFirst(ClaimTypes.NameIdentifier)?.Value, loanDto.Amount, loanDto.Currency);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (loanDto == null)
             {
                 return BadRequest("Invalid loan application data.");
@@ -56,6 +58,15 @@ namespace Loan_API.Controllers
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 var loan = _loanService.ApplyForLoan(loanDto, userId);
+
+                _logger.LogInformation(
+                    "User {UserId} applied for a {LoanType} loan of {Amount} {Currency} for {PeriodMonths} months.",
+                    userId,
+                    loan.LoanType,
+                    loan.Amount,
+                    loan.Currency,
+                    loan.PeriodMonths
+                );
 
                 return Ok(loan);
             }
@@ -70,12 +81,14 @@ namespace Loan_API.Controllers
         [Authorize (Roles = "Accountant")]
         public IActionResult UpdateLoan([FromBody] LoanDto loanDto, int id)
         {
-            _logger.LogInformation("Admin {Accountant} updated a loan with id = {Id}", User.FindFirst(ClaimTypes.NameIdentifier)?.Value, loanDto.Amount, loanDto.Currency);
+           
             if (loanDto == null)
             {
                 return BadRequest("Invalid loan update data.");
             }
+
             var loan = _loanService.UpdateLoan(loanDto, id);
+
             return Ok(loan);
         }
 

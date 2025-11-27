@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Loan_API.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -7,10 +8,9 @@ namespace Loan_API.Models
     // Enum for type of loan
     public enum LoanType
     {
-        CarLoan,
-        Mortgage,
-        QuickLoan,
-        PersonalLoan
+        Auto_Loan,
+        Quick_Loan,
+        Installment
     }
 
     // Enum for loan status
@@ -27,6 +27,7 @@ namespace Loan_API.Models
         public int Id { get; set; }
 
         [Required]
+        [LoanTypeValidation]
         public LoanType LoanType { get; set; }
 
         [Required]
@@ -35,6 +36,7 @@ namespace Loan_API.Models
 
         [Required]
         [MaxLength(3)]
+        [CurrencyValidation]
         public string Currency { get; set; } // e.g., USD, GEL, EUR
 
         [Required]
